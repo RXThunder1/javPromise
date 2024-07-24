@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck of Cards</title>
+</head>
+<body>
+    <h1>Deck of Cards</h1>
+    <button id="drawCardBtn">Draw a Card</button>
+    <div id="cards"></div>
+
+    <script>
+        let deckId;
+
+        // Request a new deck when the page loads
+        fetch('https://deckofcardsapi.com/api/deck/new/shuffle/')
+            .then(response => response.json())
+            .then(data => {
+                deckId = data.deck_id; // Store the deck ID for subsequent requests
+                document.getElementById('drawCardBtn').addEventListener('click', drawCard);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+        function drawCard() {
+            fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/`)
+                .then(response => response.json())
+                .then(data => {
+                    const cardElement = document.createElement('p');
+                    cardElement.textContent = `${data.cards[0].value} of ${data.cards[0].suit}`;
+                    document.getElementById('cards').appendChild(cardElement);
+
+                    if (data.remaining === 0) {
+                        document.getElementById('drawCardBtn').disabled = true;
+                        alert('No more cards left in the deck!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
